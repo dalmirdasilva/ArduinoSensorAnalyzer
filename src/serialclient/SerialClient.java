@@ -15,9 +15,17 @@ import java.util.TooManyListenersException;
 
 public class SerialClient {
 
+    private final String portName;
+    private final int speed;
+    
+    public SerialClient(final String portName, final int speed) {
+        this.portName = portName;
+        this.speed = speed;
+    }
+
     private SerialPort serialPort;
 
-    public void connect(String portName) throws
+    public void connect() throws
             NoSuchPortException,
             PortInUseException,
             UnsupportedCommOperationException,
@@ -36,7 +44,7 @@ public class SerialClient {
             if (commPort instanceof SerialPort) {
 
                 serialPort = (SerialPort) commPort;
-                serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                serialPort.setSerialPortParams(speed, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
                 serialPort.notifyOnDataAvailable(true);
             } else {
                 throw new SerialClientException("Only serial ports are handled by this example.");
@@ -44,7 +52,7 @@ public class SerialClient {
         }
     }
 
-    public void addSerialPortEventListener(SerialPortEventListener serialPortEventListener) throws TooManyListenersException, SerialClientException {
+    public void addSerialPortEventListener(final SerialPortEventListener serialPortEventListener) throws TooManyListenersException, SerialClientException {
         if (serialPort == null) {            
             throw new SerialClientException("Serial port is not ready"); 
         }
