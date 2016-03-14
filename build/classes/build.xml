@@ -1,0 +1,49 @@
+<project name="ArduinoSensorAnalyzer" basedir="." default="main">
+
+    <property environment="env"/>
+    <property name="src.dir" value="./"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir" value="${build.dir}/jar"/>
+    <property name="lib.dir" value="${build.dir}/lib:/work/opensource/personal/microcontroller/raspberry/RaspberryJavaIOExpander/src/build/lib"/>
+    <property name="main-class" value="arduinosensoranalyzer.ArduinoSensorAnalyzer"/>
+
+    <path id="external-classpath">
+        <pathelement location="/usr/share/java/RXTXcomm.jar" />
+        <pathelement location="/work/opensource/personal/microcontroller/raspberry/RaspberryJavaIOExpander/src/build/jar/RaspberryJavaIOExpander.jar" />
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <echo>Java/JVM version: ${ant.java.version}</echo> 
+        <mkdir dir="${classes.dir}"/>
+        <javac includeantruntime="true" srcdir="${src.dir}" destdir="${classes.dir}" target="1.8" source="1.8">
+            <include name="**/*.java"/>
+            <classpath refid="external-classpath" />
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+                <attribute name="Class-Path" value="/usr/share/java/RXTXcomm.jar /work/opensource/personal/microcontroller/raspberry/RaspberryJavaIOExpander/src/build/jar/RaspberryJavaIOExpander.jar"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true">
+            <sysproperty key="java.library.path" path=".:${lib.dir}:/usr/lib/jni/"/>
+        </java>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,run"/>
+
+</project>

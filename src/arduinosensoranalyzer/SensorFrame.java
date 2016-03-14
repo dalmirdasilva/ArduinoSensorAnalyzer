@@ -1,6 +1,11 @@
 package arduinosensoranalyzer;
 
-public class SensorFrame {
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+
+public class SensorFrame implements Serializable {
 
     static final byte START = (byte) 0xaa;
     static final byte END = (byte) 0xbb;
@@ -66,6 +71,20 @@ public class SensorFrame {
 
     public void setTime(long time) {
         this.time = time;
+    }
+    
+    public byte[] serialize() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(MAX_FRAME_SIZE);
+        DataOutputStream dos = new DataOutputStream(baos);
+        dos.writeByte((byte) 0xaa);
+        dos.writeShort((short) x & 0xffff);
+        dos.writeShort((short) y & 0xffff);
+        dos.writeShort((short) z & 0xffff);
+        dos.writeByte(flags);
+        dos.writeInt((int) time & 0xffffffff);
+        dos.writeByte((byte) 0xbb);
+        dos.close();
+        return baos.toByteArray();
     }
 
     @Override
